@@ -14,9 +14,9 @@ object RetrofitInstance {
     }
 
     private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(60, TimeUnit.SECONDS)  // Increased from 30 to 60 seconds
-        .readTimeout(60, TimeUnit.SECONDS)     // Increased from 30 to 60 seconds
-        .writeTimeout(60, TimeUnit.SECONDS)    // Increased from 30 to 60 seconds
+        .connectTimeout(30, TimeUnit.SECONDS)  // Increased from 30 to 60 seconds
+        .readTimeout(30, TimeUnit.SECONDS)     // Increased from 30 to 60 seconds
+        .writeTimeout(30, TimeUnit.SECONDS)    // Increased from 30 to 60 seconds
         .addInterceptor(loggingInterceptor)
         .build()
 
@@ -27,5 +27,6 @@ object RetrofitInstance {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiInterface::class.java)
+
     }
 }

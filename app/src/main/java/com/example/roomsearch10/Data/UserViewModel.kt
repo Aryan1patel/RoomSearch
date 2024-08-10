@@ -7,6 +7,8 @@ import com.example.roomsearch10.Api.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import retrofit2.Response
 
 sealed class UserListState {
     object Loading : UserListState()
@@ -14,11 +16,20 @@ sealed class UserListState {
     data class Error(val message: String) : UserListState()
 }
 
+sealed class UserPostState {
+    object Loading : UserPostState()
+    data class Success(val user: User) : UserPostState()
+    data class Error(val message: String) : UserPostState()
+}
+
 class UserViewModel : ViewModel() {
     private val repository = UserRepository()
 
     private val _userListState = MutableStateFlow<UserListState>(UserListState.Loading)
     val userResponse: StateFlow<UserListState> = _userListState
+
+    private val _userPostState = MutableStateFlow<UserPostState>(UserPostState.Loading)
+    val userPostState: StateFlow<UserPostState> = _userPostState
 
     init {
         fetchUsers()
@@ -33,12 +44,44 @@ class UserViewModel : ViewModel() {
                     val users = response.body() ?: emptyList()
                     _userListState.value = UserListState.Success(users)
                 } else {
-                    _userListState.value = UserListState.Error("Failed to fetch users: HTTP ${response.code()}")
+                    _userListState.value =
+                        UserListState.Error("Failed to fetch users: HTTP ${response.code()}")
                 }
             } catch (e: Exception) {
-                _userListState.value = UserListState.Error("An error occurred: ${e.localizedMessage}")
+                _userListState.value =
+                    UserListState.Error("An error occurred: ${e.localizedMessage}")
                 Log.e("UserViewModel", "Error fetching users", e)
             }
         }
     }
+
+        fun postUser(user: User) {
+            viewModelScope.launch {
+                _userPostState.value = UserPostState.Loading
+                try {
+                    val response = repository.postUser(user).execute()
+                    if (response.isSuccessful) {
+                        val createdUser = response.body()
+                        if (createdUser != null) {
+                            _userPostState.value = UserPostState.Success(createdUser)
+                        } else {
+                            _userPostState.value = UserPostState.Error("User creation failed: Response body is null")
+                        }
+                    } else {
+                        _userPostState.value = UserPostState.Error("Failed to create user: HTTP ${response.code()}")
+                    }
+                } catch (e: HttpException) {
+                    _userPostState.value = UserPostState.Error("An error occurred: ${e.localizedMessage}")
+                    Log.e("UserViewModel", "Error posting user", e)
+                } catch (e: Exception) {
+                    _userPostState.value = UserPostState.Error("An error occurred: ${e.localizedMessage}")
+                    Log.e("UserViewModel", "Error posting user", e)
+                }
+            }
+        }
+
+
+
+
+
 }

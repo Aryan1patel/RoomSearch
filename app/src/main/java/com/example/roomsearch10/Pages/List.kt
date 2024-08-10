@@ -1,6 +1,9 @@
 package com.example.roomsearch10.Pages
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,10 +18,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,9 +43,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,54 +64,106 @@ import com.example.roomsearch10.UserCard
 @Composable
 fun ListRoom(viewModel: UserViewModel){
 
-    Box(modifier= Modifier.fillMaxSize()) {
+    val context = LocalContext.current
+    val userListState by viewModel.userResponse.collectAsState()
+    var selectedFloor by remember { mutableStateOf<String?>(null) }
+    var selectedHostelBlock by remember { mutableStateOf<String?>(null) }
 
+    val floors = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10","11","12")
+    val hostelBlocks = listOf("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10","c11","c12")
 
-
-
-        Column(modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-
-            var text by remember { mutableStateOf("") }
-
-
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             TopBarNew(modifier = Modifier)
 
             Spacer(modifier = Modifier.height(3.dp))
 
-            val userListState by viewModel.userResponse.collectAsState()
+            // Dropdown Menus
+            DropdownMenu(
+                selectedOption = selectedFloor,
+                onOptionSelected = { selectedFloor = it },
+                options = floors,
+                label = "Desired Floor"
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            DropdownMenu(
+                selectedOption = selectedHostelBlock,
+                onOptionSelected = { selectedHostelBlock = it },
+                options = hostelBlocks,
+                label = "Desired Hostel Block"
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             if (userListState is UserListState.Loading) {
-                // Show a loading indicator
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             } else if (userListState is UserListState.Success) {
-                // Display the list of users
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp)
-                ) {
-                    items((userListState as UserListState.Success).users) { user ->
+                val filteredUsers = (userListState as UserListState.Success).users.filter { user ->
+                    (selectedFloor == null || user.currentFloor == selectedFloor) &&
+                            (selectedHostelBlock == null || user.currentHostelBlock == selectedHostelBlock)
+                }
+
+                LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
+                    items(filteredUsers) { user ->
                         PersonInfoBar(user = user)
                     }
                 }
             }
         }
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownMenu(
+    selectedOption: String?,
+    onOptionSelected: (String) -> Unit,
+    options: List<String>,
+    label: String
+) {
+    var expanded by remember { mutableStateOf(false) }
 
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        OutlinedTextField(
+            value = selectedOption?: "",
+            onValueChange = {},
+            label = { Text(label) },
+            readOnly = true,
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier.menuAnchor().fillMaxWidth(0.7f),
+            shape = RoundedCornerShape(16.dp)
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
     }
 }
 
 
 
+
 @Composable
 fun PersonInfoBar(user: User){
-
-
 
     Box(
         modifier = Modifier
@@ -124,10 +197,7 @@ fun PersonInfoBar(user: User){
                 ) {
 
                     Text(text = "Name: ${user.name} ", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
-                    Row {
-                        Text(text = "Email: ", fontFamily = customFontFamily2)
-                        Text(text = user.email, fontFamily = customFontFamily2, fontSize = 11.sp)
-                    }
+                    ClickableEmailRow(user = user)
                     Text(text = "Phone no: ${user.phoneNo}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
                     Text(text = "Current Floor: ${user.currentFloor}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
                     Text(text = "Current Hostel Block: ${user.currentHostelBlock}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
@@ -165,6 +235,46 @@ fun PersonInfoBar(user: User){
     }
 
 }
+
+
+@Composable
+fun ClickableEmailRow(user: User) {
+    val customFontFamily = FontFamily(
+        Font(R.font.lastica)
+    )
+    val customFontFamily2 = FontFamily(
+        Font(R.font.fontnew, FontWeight.Bold)
+    )
+    val context = LocalContext.current
+
+    Row (verticalAlignment = Alignment.CenterVertically){
+        Text(text = "Email: ", fontFamily = customFontFamily2)
+
+        // Create an AnnotatedString with clickable text
+        val annotatedString = buildAnnotatedString {
+            withStyle(style = SpanStyle(color = Color.Blue.copy(alpha = 0.7f), textDecoration = TextDecoration.Underline)) {
+                append(user.email)
+            }
+        }
+//
+//        ClickableText(
+//            text = annotatedString,
+//            style = TextStyle(fontFamily = customFontFamily2, fontSize = 11.sp),
+//            onClick = {
+//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:${user.email}"))
+//                context.startActivity(intent)
+//            }
+//        )
+
+        ClickableText(text = annotatedString,
+            style = TextStyle(fontFamily = customFontFamily2, fontSize = 11.sp),
+            onClick = {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:${user.email}"))
+                context.startActivity(intent)
+            })
+    }
+}
+
 
 //@Preview(showBackground = true, showSystemUi = true)
 //@Composable

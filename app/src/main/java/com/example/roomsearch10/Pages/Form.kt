@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,15 +34,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.roomsearch10.Data.User
+import com.example.roomsearch10.Data.UserPostState
+import com.example.roomsearch10.Data.UserViewModel
 import com.example.roomsearch10.R
 
 @Composable
 fun FormPage(navController: NavController) {
     val context = LocalContext.current
-//    val userViewModel: UserViewModel = viewModel()
+    val userViewModel: UserViewModel = viewModel()
 
     val email = remember { mutableStateOf("") }
     val name = remember { mutableStateOf("") }
@@ -49,6 +54,8 @@ fun FormPage(navController: NavController) {
     val desiredFloor = remember { mutableStateOf("") }
     val desiredHostelBlock = remember { mutableStateOf("") }
     val phoneNo = remember { mutableStateOf("") }
+
+    val userPostState = userViewModel.userPostState.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -62,9 +69,9 @@ fun FormPage(navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-           TopBarNew(modifier = Modifier)
+            TopBarNew(modifier = Modifier)
 
-            OneFillString(value = email, what = "BU email ID")
+            OneEmail(value = email, what = "BU Email")
             OneFillString(value = name, what = "Name")
             OneFillInt(value = phoneNo, what = "Phone no")
             OneFillInt(value = currentFloor, what = "Current Floor")
@@ -81,7 +88,6 @@ fun FormPage(navController: NavController) {
                         Toast.makeText(context, "Please fill out all required fields", Toast.LENGTH_SHORT).show()
                     } else {
                         val user = User(
-                            _id = "",
                             email = email.value,
                             name = name.value,
                             phoneNo = phoneNo.value,
@@ -89,8 +95,9 @@ fun FormPage(navController: NavController) {
                             currentFloor = currentFloor.value,
                             desiredHostelBlock = desiredHostelBlock.value.lowercase(),
                             desiredFloor = desiredFloor.value,
-                            __v = 0
                         )
+
+                        userViewModel.postUser(user) // Post the user
 
                         navController.navigate("list")
                     }
@@ -99,9 +106,24 @@ fun FormPage(navController: NavController) {
             ) {
                 Text(text = "SUBMIT", fontFamily = FontFamily(Font(R.font.fontnew, FontWeight.Bold)), fontWeight = FontWeight.Bold)
             }
+
+            // Observe the result of the postUser operation and show appropriate feedback
+            when (val state = userPostState.value) {
+                is UserPostState.Loading -> {
+                    // Show loading indicator, e.g., a progress bar or a loading spinner
+                }
+                is UserPostState.Success -> {
+                    Toast.makeText(context, "User created successfully!", Toast.LENGTH_SHORT).show()
+                }
+//                is UserPostState.Error -> {
+//                    Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
+//                }
+               else -> {}
+            }
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,6 +166,48 @@ fun OneFillInt(value: MutableState<String>, what: String) {
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
 }
+
+
+// for email
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OneEmail(value: MutableState<String>, what: String) {
+    val isValidEmail = remember { mutableStateOf(true) }
+
+    Spacer(modifier = Modifier.height(5.dp))
+
+    OutlinedTextField(
+        value = value.value,
+        onValueChange = { newValue ->
+            value.value = newValue
+            isValidEmail.value = newValue.endsWith("@bennett.edu.in")
+        },
+        shape = RoundedCornerShape(12.dp),
+        label = {
+            Text(
+                text = what,
+                fontFamily = FontFamily(Font(R.font.fontnew, FontWeight.Bold)),
+                color = if (isValidEmail.value) Color.Black else Color.Red
+            )
+        },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = if (isValidEmail.value) Color.White else Color.Red,
+            unfocusedBorderColor = Color.Black
+        ),
+        isError = !isValidEmail.value // Show error state if the email is not valid
+    )
+
+    if (!isValidEmail.value) {
+        Text(
+            text = "Email must end with @bennett.edu.in",
+            color = Color.Red,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+    }
+}
+
 
 //@Preview
 //@Composable

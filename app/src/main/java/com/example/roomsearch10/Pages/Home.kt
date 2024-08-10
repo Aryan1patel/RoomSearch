@@ -16,10 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -37,12 +39,15 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.roomsearch10.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun Home(navController: NavController) {
     val customFontFamily = FontFamily(
         Font(R.font.lastica)
     )
+    val scope : CoroutineScope = rememberCoroutineScope()
 
     Log.d("checking", "called innnnnn")
 
@@ -148,6 +153,8 @@ fun Home(navController: NavController) {
 @Composable
 fun TopBarNew(modifier: Modifier) {
 
+    val scope : CoroutineScope = rememberCoroutineScope()
+
     val customFontFamily = FontFamily(
         Font(R.font.fontnew, FontWeight.Bold)
     )
@@ -181,12 +188,15 @@ fun TopBarNew(modifier: Modifier) {
                 }
             },
             navigationIcon = {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = null,
-                    modifier = Modifier.size(30.dp),
-                    tint = Color.White
-                )
+                IconButton(onClick = {
+                    scope.launch {
+                        Log.d("checking", "called")
+
+                    }
+                }) {
+                    Icon(imageVector = Icons.Default.Menu, contentDescription = null)
+
+                }
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent, // Set to transparent to use Box's background color
