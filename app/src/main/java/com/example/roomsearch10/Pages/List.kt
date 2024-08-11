@@ -2,6 +2,7 @@ package com.example.roomsearch10.Pages
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +44,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -55,61 +58,85 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.roomsearch10.Data.User
 import com.example.roomsearch10.Data.UserListState
 import com.example.roomsearch10.Data.UserViewModel
 import com.example.roomsearch10.R
-import com.example.roomsearch10.UserCard
 
 @Composable
-fun ListRoom(viewModel: UserViewModel){
+fun ListRoom(viewModel: UserViewModel,navController: NavController) {
+    PageTemplate(
+        navController = navController,
+        pageTitle = "Home"
+    ) {
 
-    val context = LocalContext.current
-    val userListState by viewModel.userResponse.collectAsState()
-    var selectedFloor by remember { mutableStateOf<String?>(null) }
-    var selectedHostelBlock by remember { mutableStateOf<String?>(null) }
-
-    val floors = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10","11","12")
-    val hostelBlocks = listOf("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10","c11","c12")
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            TopBarNew(modifier = Modifier)
-
-            Spacer(modifier = Modifier.height(3.dp))
-
-            // Dropdown Menus
-            DropdownMenu(
-                selectedOption = selectedFloor,
-                onOptionSelected = { selectedFloor = it },
-                options = floors,
-                label = "Desired Floor"
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.bglist),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            val context = LocalContext.current
+            val userListState by viewModel.userResponse.collectAsState()
+            var selectedFloor by remember { mutableStateOf<String?>(null) }
+            var selectedHostelBlock by remember { mutableStateOf<String?>(null) }
 
-            DropdownMenu(
-                selectedOption = selectedHostelBlock,
-                onOptionSelected = { selectedHostelBlock = it },
-                options = hostelBlocks,
-                label = "Desired Hostel Block"
-            )
+            val floors = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+            val hostelBlocks =
+                listOf("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "c11", "c12")
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
 
-            if (userListState is UserListState.Loading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else if (userListState is UserListState.Success) {
-                val filteredUsers = (userListState as UserListState.Success).users.filter { user ->
-                    (selectedFloor == null || user.currentFloor == selectedFloor) &&
-                            (selectedHostelBlock == null || user.currentHostelBlock == selectedHostelBlock)
-                }
+                    Spacer(modifier = Modifier.height(3.dp))
 
-                LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
-                    items(filteredUsers) { user ->
-                        PersonInfoBar(user = user)
+                    // Dropdown Menus
+                    DropdownMenu(
+                        selectedOption = selectedFloor,
+                        onOptionSelected = { selectedFloor = it },
+                        options = floors,
+                        label = "Desired Floor"
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    DropdownMenu(
+                        selectedOption = selectedHostelBlock,
+                        onOptionSelected = { selectedHostelBlock = it },
+                        options = hostelBlocks,
+                        label = "Desired Hostel Block"
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    if (userListState is UserListState.Loading) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else if (userListState is UserListState.Success) {
+                        val filteredUsers =
+                            (userListState as UserListState.Success).users.filter { user ->
+                                (selectedFloor == null || user.currentFloor == selectedFloor) &&
+                                        (selectedHostelBlock == null || user.currentHostelBlock == selectedHostelBlock)
+                            }
+
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp)
+                        ) {
+                            items(filteredUsers) { user ->
+                                PersonInfoBar(user = user)
+                            }
+                        }
                     }
                 }
             }
@@ -125,6 +152,9 @@ fun DropdownMenu(
     options: List<String>,
     label: String
 ) {
+    val customFontFamily2 = FontFamily(
+        Font(R.font.fontnew, FontWeight.Bold)
+    )
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
@@ -134,7 +164,7 @@ fun DropdownMenu(
         OutlinedTextField(
             value = selectedOption?: "",
             onValueChange = {},
-            label = { Text(label) },
+            label = { Text(label, fontFamily = customFontFamily2, fontWeight = FontWeight.Bold) },
             readOnly = true,
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -182,7 +212,7 @@ fun PersonInfoBar(user: User){
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 40.dp, start = 50.dp), // Add top and start padding to make room for the image
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         ) {
             // Content of the details box
 
@@ -256,15 +286,7 @@ fun ClickableEmailRow(user: User) {
                 append(user.email)
             }
         }
-//
-//        ClickableText(
-//            text = annotatedString,
-//            style = TextStyle(fontFamily = customFontFamily2, fontSize = 11.sp),
-//            onClick = {
-//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:${user.email}"))
-//                context.startActivity(intent)
-//            }
-//        )
+
 
         ClickableText(text = annotatedString,
             style = TextStyle(fontFamily = customFontFamily2, fontSize = 11.sp),

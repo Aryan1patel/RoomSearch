@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "RoomSearch1.0"
+rootProject.name = "RoomSearch"
 include(":app")
  

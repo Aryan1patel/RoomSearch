@@ -44,81 +44,95 @@ import com.example.roomsearch10.R
 
 @Composable
 fun FormPage(navController: NavController) {
-    val context = LocalContext.current
-    val userViewModel: UserViewModel = viewModel()
+    PageTemplate(
+        navController = navController,
+        pageTitle = "Form"
+    ) {
+        val context = LocalContext.current
+        val userViewModel: UserViewModel = viewModel()
 
-    val email = remember { mutableStateOf("") }
-    val name = remember { mutableStateOf("") }
-    val currentFloor = remember { mutableStateOf("") }
-    val currentHostelBlock = remember { mutableStateOf("") }
-    val desiredFloor = remember { mutableStateOf("") }
-    val desiredHostelBlock = remember { mutableStateOf("") }
-    val phoneNo = remember { mutableStateOf("") }
+        val email = remember { mutableStateOf("") }
+        val name = remember { mutableStateOf("") }
+        val currentFloor = remember { mutableStateOf("") }
+        val currentHostelBlock = remember { mutableStateOf("") }
+        val desiredFloor = remember { mutableStateOf("") }
+        val desiredHostelBlock = remember { mutableStateOf("") }
+        val phoneNo = remember { mutableStateOf("") }
 
-    val userPostState = userViewModel.userPostState.collectAsState()
+        val userPostState = userViewModel.userPostState.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.bg),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.bglist),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            TopBarNew(modifier = Modifier)
-
-            OneEmail(value = email, what = "BU Email")
-            OneFillString(value = name, what = "Name")
-            OneFillInt(value = phoneNo, what = "Phone no")
-            OneFillInt(value = currentFloor, what = "Current Floor")
-            OneFillString(value = currentHostelBlock, what = "Current Hostel Block")
-            OneFillInt(value = desiredFloor, what = "Desired Floor")
-            OneFillString(value = desiredHostelBlock, what = "Desired Hostel Block")
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Button(
-                onClick = {
-                    if (email.value.isEmpty() || name.value.isEmpty() || currentHostelBlock.value.isEmpty()) {
-                        Log.d("Viewmodel", "Please fill out all required fields")
-                        Toast.makeText(context, "Please fill out all required fields", Toast.LENGTH_SHORT).show()
-                    } else {
-                        val user = User(
-                            email = email.value,
-                            name = name.value,
-                            phoneNo = phoneNo.value,
-                            currentHostelBlock = currentHostelBlock.value.lowercase(),
-                            currentFloor = currentFloor.value,
-                            desiredHostelBlock = desiredHostelBlock.value.lowercase(),
-                            desiredFloor = desiredFloor.value,
-                        )
-
-                        userViewModel.postUser(user) // Post the user
-
-                        navController.navigate("list")
-                    }
-                },
-                modifier = Modifier.size(height = 50.dp, width = 150.dp)
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "SUBMIT", fontFamily = FontFamily(Font(R.font.fontnew, FontWeight.Bold)), fontWeight = FontWeight.Bold)
-            }
 
-            // Observe the result of the postUser operation and show appropriate feedback
-            when (val state = userPostState.value) {
-                is UserPostState.Loading -> {
-                    // Show loading indicator, e.g., a progress bar or a loading spinner
+                OneEmail(value = email, what = "BU Email")
+                OneFillString(value = name, what = "Name")
+                OneFillInt(value = phoneNo, what = "Phone no")
+                OneFillInt(value = currentFloor, what = "Current Floor")
+                OneFillString(value = currentHostelBlock, what = "Current Hostel Block")
+                OneFillInt(value = desiredFloor, what = "Desired Floor")
+                OneFillString(value = desiredHostelBlock, what = "Desired Hostel Block")
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    onClick = {
+                        if (email.value.isEmpty() || name.value.isEmpty() || currentHostelBlock.value.isEmpty()) {
+                            Log.d("Viewmodel", "Please fill out all required fields")
+                            Toast.makeText(
+                                context,
+                                "Please fill out all required fields",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            val user = User(
+                                email = email.value,
+                                name = name.value,
+                                phoneNo = phoneNo.value,
+                                currentHostelBlock = currentHostelBlock.value.lowercase(),
+                                currentFloor = currentFloor.value,
+                                desiredHostelBlock = desiredHostelBlock.value.lowercase(),
+                                desiredFloor = desiredFloor.value,
+                            )
+
+                            userViewModel.postUser(user) // Post the user
+
+                            navController.navigate("list")
+                        }
+                    },
+                    modifier = Modifier.size(height = 50.dp, width = 150.dp)
+                ) {
+                    Text(
+                        text = "SUBMIT",
+                        fontFamily = FontFamily(Font(R.font.fontnew, FontWeight.Bold)),
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-                is UserPostState.Success -> {
-                    Toast.makeText(context, "User created successfully!", Toast.LENGTH_SHORT).show()
-                }
+
+                // Observe the result of the postUser operation and show appropriate feedback
+                when (val state = userPostState.value) {
+                    is UserPostState.Loading -> {
+                        // Show loading indicator, e.g., a progress bar or a loading spinner
+                    }
+
+                    is UserPostState.Success -> {
+                        Toast.makeText(context, "User created successfully!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
 //                is UserPostState.Error -> {
 //                    Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
 //                }
-               else -> {}
+                    else -> {}
+                }
             }
         }
     }

@@ -44,10 +44,16 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun Home(navController: NavController) {
+    PageTemplate(
+        navController = navController,
+        pageTitle = "Home"
+    ) {
+
+
     val customFontFamily = FontFamily(
         Font(R.font.lastica)
     )
-    val scope : CoroutineScope = rememberCoroutineScope()
+    val scope: CoroutineScope = rememberCoroutineScope()
 
     Log.d("checking", "called innnnnn")
 
@@ -60,15 +66,8 @@ fun Home(navController: NavController) {
         )
 
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (topBar, firstText, buttonBox,buttonBox2) = createRefs()
+            val (topBar, firstText, buttonBox, buttonBox2) = createRefs()
 
-            TopBarNew(
-                modifier = Modifier.constrainAs(topBar) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-            )
 
             Text(
                 text = "GET YOUR ROOM OF YOUR CHOICE",
@@ -148,67 +147,68 @@ fun Home(navController: NavController) {
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBarNew(modifier: Modifier) {
-
-    val scope : CoroutineScope = rememberCoroutineScope()
-
-    val customFontFamily = FontFamily(
-        Font(R.font.fontnew, FontWeight.Bold)
-    )
-
-    Log.d("Home", "Top bar")
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = Color.Black,
-                shape = RoundedCornerShape(bottomEnd = 14.dp, bottomStart = 14.dp)
-            )
-    ) {
-        TopAppBar(
-            title = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 100.dp)
-                ) {
-                    Column {
-                        Text(
-                            text = "RoomSearch",
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = customFontFamily,
-                            fontSize = 24.sp,
-                            color = Color.White
-                        )
-                    }
-                }
-            },
-            navigationIcon = {
-                IconButton(onClick = {
-                    scope.launch {
-                        Log.d("checking", "called")
-
-                    }
-                }) {
-                    Icon(imageVector = Icons.Default.Menu, contentDescription = null)
-
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent, // Set to transparent to use Box's background color
-                titleContentColor = Color.White,
-                navigationIconContentColor = Color.White
-            )
-        )
-    }
-
-
-
 }
+
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun TopBarNew(modifier: Modifier) {
+//
+//    val scope : CoroutineScope = rememberCoroutineScope()
+//
+//    val customFontFamily = FontFamily(
+//        Font(R.font.fontnew, FontWeight.Bold)
+//    )
+//
+//    Log.d("Home", "Top bar")
+//
+//    Box(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .background(
+//                color = Color.Black,
+//                shape = RoundedCornerShape(bottomEnd = 14.dp, bottomStart = 14.dp)
+//            )
+//    ) {
+//        TopAppBar(
+//            title = {
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(start = 100.dp)
+//                ) {
+//                    Column {
+//                        Text(
+//                            text = "RoomSearch",
+//                            fontWeight = FontWeight.Bold,
+//                            fontFamily = customFontFamily,
+//                            fontSize = 24.sp,
+//                            color = Color.White
+//                        )
+//                    }
+//                }
+//            },
+//            navigationIcon = {
+//                IconButton(onClick = {
+//                    scope.launch {
+//                        Log.d("checking", "called")
+//
+//                    }
+//                }) {
+//                    Icon(imageVector = Icons.Default.Menu, contentDescription = null)
+//
+//                }
+//            },
+//            colors = TopAppBarDefaults.topAppBarColors(
+//                containerColor = Color.Transparent, // Set to transparent to use Box's background color
+//                titleContentColor = Color.White,
+//                navigationIconContentColor = Color.White
+//            )
+//        )
+//    }
+//
+//
+//
+//}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

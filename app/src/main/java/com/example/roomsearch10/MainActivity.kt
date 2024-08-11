@@ -31,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.roomsearch10.Data.User
 import com.example.roomsearch10.Data.UserListState
 import com.example.roomsearch10.Data.UserViewModel
+import com.example.roomsearch10.Pages.ContactUs
 import com.example.roomsearch10.Pages.FormPage
 import com.example.roomsearch10.Pages.Home
 import com.example.roomsearch10.Pages.ListRoom
@@ -63,8 +64,12 @@ fun NavigationGraph() {
             FormPage(navController)
         }
          composable("list") {
-            ListRoom(viewModel = userViewModel)
+            ListRoom(viewModel = userViewModel, navController)
         }
+        composable("contact") {
+            ContactUs(navController = navController)
+        }
+
     }
 }
 
