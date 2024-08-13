@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -157,20 +158,22 @@ fun ContactUs(navController: NavController){
                         Text(
                             text = "Aryan Patel",
                             fontWeight = FontWeight.Bold,
-                            fontFamily = customFontFamily2
+                            fontFamily = customFontFamily2,
+                            color = Color.Black
                         )
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "Phone No: ",
                                 fontWeight = FontWeight.Bold,
-                                fontFamily = customFontFamily2
+                                fontFamily = customFontFamily2,
+                                color = Color.Black
                             )
 
                             val annotatedString = buildAnnotatedString {
                                 withStyle(
                                     style = SpanStyle(
-                                        color = Color.Blue.copy(alpha = 0.7f),
+                                        color = Color.Blue.copy(alpha = 0.5f),
                                         textDecoration = TextDecoration.Underline
                                     )
                                 ) {
@@ -198,7 +201,7 @@ fun ContactUs(navController: NavController){
                         val annotatedString1 = buildAnnotatedString {
                             withStyle(
                                 style = SpanStyle(
-                                    color = Color.Blue.copy(alpha = 0.7f),
+                                    color = Color.Blue.copy(alpha = 0.5f),
                                     textDecoration = TextDecoration.Underline
                                 )
                             ) {
@@ -225,7 +228,8 @@ fun ContactUs(navController: NavController){
                         Text(
                             text = "Pranay Prasoon",
                             fontWeight = FontWeight.Bold,
-                            fontFamily = customFontFamily2
+                            fontFamily = customFontFamily2,
+                            color = Color.Black
                         )
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -233,12 +237,13 @@ fun ContactUs(navController: NavController){
                                 text = "Phone No: ",
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = customFontFamily2,
+                                color = Color.Black
                             )
 
                             val annotatedStringnew = buildAnnotatedString {
                                 withStyle(
                                     style = SpanStyle(
-                                        color = Color.Blue.copy(alpha = 0.7f),
+                                        color = Color.Blue.copy(alpha = 0.5f),
                                         textDecoration = TextDecoration.Underline
                                     )
                                 ) {
@@ -267,7 +272,7 @@ fun ContactUs(navController: NavController){
                         val annotatedStringp1 = buildAnnotatedString {
                             withStyle(
                                 style = SpanStyle(
-                                    color = Color.Blue.copy(alpha = 0.7f),
+                                    color = Color.Blue.copy(alpha = 0.5f),
                                     textDecoration = TextDecoration.Underline
                                 )
                             ) {

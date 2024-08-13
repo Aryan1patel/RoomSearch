@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id ("com.google.gms.google-services")  // Apply the Google Services plugin
+
 }
 
 android {
@@ -51,6 +53,9 @@ android {
 
 dependencies {
 
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-analytics")
+
     implementation ("androidx.compose.ui:ui:1.4.0")
     implementation ("androidx.compose.material3:material3:1.0.0")
     implementation ("androidx.compose.ui:ui-tooling-preview:1.4.0")
@@ -84,3 +89,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+

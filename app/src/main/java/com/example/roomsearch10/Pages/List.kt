@@ -2,6 +2,7 @@ package com.example.roomsearch10.Pages
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,6 +24,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,6 +35,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
@@ -70,6 +75,10 @@ fun ListRoom(viewModel: UserViewModel,navController: NavController) {
         navController = navController,
         pageTitle = "Home"
     ) {
+
+        val customFontFamily2 = FontFamily(
+            Font(R.font.fontnew, FontWeight.Bold)
+        )
 
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -115,27 +124,56 @@ fun ListRoom(viewModel: UserViewModel,navController: NavController) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    if (userListState is UserListState.Loading) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center) {
+                        Button(
+                            modifier = Modifier.size(height = 40.dp, width = 150.dp),
+
+                            onClick = {
+                                selectedFloor = null
+                                selectedHostelBlock = null
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black) // Use ButtonDefaults to set colors
                         ) {
-                            CircularProgressIndicator()
+                            Text(
+                                text = "Clear Selection",
+                                fontFamily = customFontFamily2,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White // Set text color for better contrast
+                            )
                         }
-                    } else if (userListState is UserListState.Success) {
-                        val filteredUsers =
-                            (userListState as UserListState.Success).users.filter { user ->
+                    }
+
+                    when (userListState) {
+                        is UserListState.Loading -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                        is UserListState.Success -> {
+                            val filteredUsers = (userListState as UserListState.Success).users.filter { user ->
                                 (selectedFloor == null || user.currentFloor == selectedFloor) &&
-                                        (selectedHostelBlock == null || user.currentHostelBlock == selectedHostelBlock)
+                                        (selectedHostelBlock == null ||  user.currentHostelBlock.replace(" ", "").trim().let { current ->
+                                            current == selectedHostelBlock || current.startsWith(
+                                                selectedHostelBlock!!
+                                            )
+                                        })
                             }
 
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp)
-                        ) {
-                            items(filteredUsers) { user ->
-                                PersonInfoBar(user = user)
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(16.dp)
+                            ) {
+                                items(filteredUsers) { user ->
+                                    PersonInfoBar(user = user)
+                                }
                             }
+                        }
+                        else -> {
+                            Toast.makeText(context, "NO USER FOUND", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -164,13 +202,16 @@ fun DropdownMenu(
         OutlinedTextField(
             value = selectedOption?: "",
             onValueChange = {},
-            label = { Text(label, fontFamily = customFontFamily2, fontWeight = FontWeight.Bold) },
+            label = { Text(label, fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = Color.Black) },
             readOnly = true,
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
-            modifier = Modifier.menuAnchor().fillMaxWidth(0.7f),
-            shape = RoundedCornerShape(16.dp)
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(0.7f),
+            shape = RoundedCornerShape(16.dp),
+            textStyle = TextStyle(fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = Color.Black),
         )
         ExposedDropdownMenu(
             expanded = expanded,
@@ -178,7 +219,7 @@ fun DropdownMenu(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = { Text(option, fontFamily = customFontFamily2, fontWeight = FontWeight.Bold) },
                     onClick = {
                         onOptionSelected(option)
                         expanded = false
@@ -213,26 +254,27 @@ fun PersonInfoBar(user: User){
                 .fillMaxWidth()
                 .padding(top = 40.dp, start = 50.dp), // Add top and start padding to make room for the image
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.8f))
         ) {
             // Content of the details box
 
 
             Column(modifier= Modifier
                 .fillMaxWidth()
-                .background(color = Color.White.copy(alpha = 0.7f))) {
+                .background(MaterialTheme.colorScheme.background)) {
 
                 Column(
                     modifier = Modifier
                         .padding(start = 66.dp, top = 16.dp) // Additional top padding inside the card
                 ) {
 
-                    Text(text = "Name: ${user.name} ", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
+                    Text(text = "Name: ${user.name} ", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     ClickableEmailRow(user = user)
-                    Text(text = "Phone no: ${user.phoneNo}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
-                    Text(text = "Current Floor: ${user.currentFloor}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
-                    Text(text = "Current Hostel Block: ${user.currentHostelBlock}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
-                    Text(text = "Desired Hostel Block: ${user.desiredHostelBlock}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
-                    Text(text = "Desired Floor: ${user.desiredFloor}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold)
+                    Text(text = "Phone no: ${user.phoneNo}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = "Current Floor: ${user.currentFloor}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = "Current Hostel Block: ${user.currentHostelBlock}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = "Desired Hostel Block: ${user.desiredHostelBlock}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = "Desired Floor: ${user.desiredFloor}", fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(modifier = Modifier.height(10.dp))
 
                 }
@@ -278,11 +320,11 @@ fun ClickableEmailRow(user: User) {
     val context = LocalContext.current
 
     Row (verticalAlignment = Alignment.CenterVertically){
-        Text(text = "Email: ", fontFamily = customFontFamily2)
+        Text(text = "Email: ", fontFamily = customFontFamily2, color = MaterialTheme.colorScheme.onSurface)
 
         // Create an AnnotatedString with clickable text
         val annotatedString = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = Color.Blue.copy(alpha = 0.7f), textDecoration = TextDecoration.Underline)) {
+            withStyle(style = SpanStyle(color = Color.Red.copy(alpha = 0.6f), textDecoration = TextDecoration.Underline)) {
                 append(user.email)
             }
         }

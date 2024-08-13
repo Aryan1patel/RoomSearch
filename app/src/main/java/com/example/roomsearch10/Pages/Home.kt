@@ -75,6 +75,7 @@ fun Home(navController: NavController) {
                 fontSize = 48.sp, // Slightly reduced font size
                 color = Color.White,
                 textAlign = TextAlign.Left,
+                maxLines = 4,
                 fontFamily = customFontFamily,
                 lineHeight = 56.sp,
                 modifier = Modifier

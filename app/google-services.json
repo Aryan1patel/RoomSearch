@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "624838495642",
+    "project_id": "roomsearch-64ab8",
+    "storage_bucket": "roomsearch-64ab8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624838495642:android:b4be86bcdb9df730927e23",
+        "android_client_info": {
+          "package_name": "com.example.roomsearch10"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4C43IHAOvcKXWY5cvDi1txg82kPgxqdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
