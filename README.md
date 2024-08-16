@@ -4,7 +4,7 @@ RoomSearch is a mobile application designed to assist college students in findin
 
 ## Download the App
 
-[![Download APK](https://img.shields.io/badge/Download-APK-brightgreen)](https://github.com/Aryan1patel/RoomSearch/releases/download/untagged-54f1c51c3059d2d8ada4/app-release.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK-brightgreen)](https://github.com/Aryan1patel/RoomSearch/releases/download/untagged-e9978e79501e2934b303/app-release.apk)
 
 
 ## Features
