@@ -68,6 +68,8 @@ import com.example.roomsearch10.Data.User
 import com.example.roomsearch10.Data.UserListState
 import com.example.roomsearch10.Data.UserViewModel
 import com.example.roomsearch10.R
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun ListRoom(viewModel: UserViewModel,navController: NavController) {
@@ -92,6 +94,7 @@ fun ListRoom(viewModel: UserViewModel,navController: NavController) {
             val userListState by viewModel.userResponse.collectAsState()
             var selectedFloor by remember { mutableStateOf<String?>(null) }
             var selectedHostelBlock by remember { mutableStateOf<String?>(null) }
+            val isRefreshing by viewModel.isRefreshing.collectAsState()
 
             val floors = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
             val hostelBlocks =
@@ -144,6 +147,11 @@ fun ListRoom(viewModel: UserViewModel,navController: NavController) {
                         }
                     }
 
+                    SwipeRefresh(
+                        state = rememberSwipeRefreshState(isRefreshing),
+                        onRefresh = { viewModel.refreshData() } // Call the refresh function in your ViewModel
+                    ) {
+
                     when (userListState) {
                         is UserListState.Loading -> {
                             Box(
@@ -154,26 +162,34 @@ fun ListRoom(viewModel: UserViewModel,navController: NavController) {
                             }
                         }
                         is UserListState.Success -> {
-                            val filteredUsers = (userListState as UserListState.Success).users.filter { user ->
-                                (selectedFloor == null || user.currentFloor == selectedFloor) &&
-                                        (selectedHostelBlock == null ||  user.currentHostelBlock.replace(" ", "").trim().let { current ->
-                                            current == selectedHostelBlock || current.startsWith(
-                                                selectedHostelBlock!!
-                                            )
-                                        })
-                            }
-
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(16.dp)
-                            ) {
-                                items(filteredUsers) { user ->
-                                    PersonInfoBar(user = user)
+                            val filteredUsers =
+                                (userListState as UserListState.Success).users.filter { user ->
+                                    (selectedFloor == null || user.currentFloor == selectedFloor) &&
+                                            (selectedHostelBlock == null || user.currentHostelBlock.replace(
+                                                " ",
+                                                ""
+                                            ).trim().let { current ->
+                                                current == selectedHostelBlock || current.startsWith(
+                                                    selectedHostelBlock!!
+                                                )
+                                            }
+                                                    )
                                 }
+
+
+
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = PaddingValues(16.dp)
+                                ) {
+                                    items(filteredUsers) { user ->
+                                        PersonInfoBar(user = user)
+                                    }
+                                }
+
                             }
-                        }
-                        else -> {
-                            Toast.makeText(context, "NO USER FOUND", Toast.LENGTH_SHORT).show()
+                            else -> {
+                            }
                         }
                     }
                 }
@@ -211,7 +227,7 @@ fun DropdownMenu(
                 .menuAnchor()
                 .fillMaxWidth(0.7f),
             shape = RoundedCornerShape(16.dp),
-            textStyle = TextStyle(fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = Color.Black),
+            textStyle = TextStyle(fontFamily = customFontFamily2, fontWeight = FontWeight.Bold, color = Color.Black ),
         )
         ExposedDropdownMenu(
             expanded = expanded,

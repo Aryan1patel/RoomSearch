@@ -53,6 +53,9 @@ android {
 
 dependencies {
 
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.28.0")
+
+
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-analytics")
 

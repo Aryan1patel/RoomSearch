@@ -32,24 +32,40 @@ class UserViewModel : ViewModel() {
     val userPostState: StateFlow<UserPostState> = _userPostState
 
     init {
-        fetchUsers()
+        fetchUsers(null,null)
     }
 
-    private fun fetchUsers() {
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> get() = _isRefreshing
+
+    fun refreshData() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            // Reload data here
+            fetchUsers(null,null)
+            _isRefreshing.value = false
+        }
+    }
+
+    private fun fetchUsers(selectedFloor: String?, selectedHostelBlock: String?) {
         viewModelScope.launch {
             try {
                 val response = repository.getUsers()
                 if (response.isSuccessful) {
-                    // Assuming the response body directly contains the list of users
-                    val users = response.body() ?: emptyList()
+                    // Filter users only if filters are applied
+                    val users = response.body()?.filter { user ->
+                        (selectedFloor == null || user.currentFloor == selectedFloor) &&
+                                (selectedHostelBlock == null || user.currentHostelBlock.replace(" ", "").trim().let { current ->
+                                    current == selectedHostelBlock || current.startsWith(selectedHostelBlock)
+                                })
+                    } ?: emptyList()
+
                     _userListState.value = UserListState.Success(users)
                 } else {
-                    _userListState.value =
-                        UserListState.Error("Failed to fetch users: HTTP ${response.code()}")
+                    _userListState.value = UserListState.Error("Failed to fetch users: HTTP ${response.code()}")
                 }
             } catch (e: Exception) {
-                _userListState.value =
-                    UserListState.Error("An error occurred: ${e.localizedMessage}")
+                _userListState.value = UserListState.Error("An error occurred: ${e.localizedMessage}")
                 Log.e("UserViewModel", "Error fetching users", e)
             }
         }
