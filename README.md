@@ -2,6 +2,11 @@
 
 RoomSearch is a mobile application designed to assist college students in finding and switching rooms or blocks with other students. This app simplifies the process of locating the desired floor or block, making it easier for students to switch rooms seamlessly. With a growing user base of over 1,000 students, RoomSearch is the go-to solution for hassle-free room exchanges.
 
+## Download the App
+
+[![Download APK](https://img.shields.io/badge/Download-APK-brightgreen)](https://github.com/Aryan1patel/RoomSearch/releases/download/untagged-54f1c51c3059d2d8ada4/app-release.apk)
+
+
 ## Features
 
 - **Student Data Management**: Students can insert their details, including their current hostel block and floor, as well as their desired block and floor.
